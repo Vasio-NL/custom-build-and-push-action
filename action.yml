@@ -78,17 +78,15 @@ runs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build and push to Amazon ECR
+    - name: Store registry url (AWS ECR)
       if: inputs.aws-access-key-id != '' && inputs.aws-secret-access-key != ''
-      uses: docker/build-push-action@v4
-      with:
-        context: inputs.docker-build-context
-        file: inputs.dockerfile-path
-        push: true
-        build-args: inputs.docker-build-args
-        tags: "${{ steps.login-ecr.outputs.registry }}/${{ inputs.container-repository-name }}/${{ inputs.docker-image-name }}:${{ inputs.github-sha }}"
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+      shell: bash
+      run: echo "REGISTRY_URL=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
+
+    - name: Store registry url (non-AWS)
+      if: inputs.container-registry-url != '' && inputs.container-registry-username != '' && inputs.container-registry-password != ''
+      shell: bash
+      run: echo "REGISTRY_URL=${{ inputs.container-registry-url }}" >> $GITHUB_ENV
 
     - name: Log in to the container registry (non-AWS)
       if: inputs.container-registry-url != '' && inputs.container-registry-username != '' && inputs.container-registry-password != ''
@@ -98,13 +96,14 @@ runs:
         username: ${{ inputs.container-registry-username }}
         password: ${{ inputs.container-registry-password }}
 
-    - name: Build and push (non-AWS)
+    - name: Build and push
       if: inputs.container-registry-url != '' && inputs.container-registry-username != '' && inputs.container-registry-password != ''
       uses: docker/build-push-action@v4
       with:
         push: true
-        context: ./wegwijzer/
-        file: ./wegwijzer/backend/docker/Dockerfile-production
-        tags: "${{ vars.REGISTRY_URL }}/${{ env.ECR_REPOSITORY }}:${{github.sha}}-${{github.run_id}}"
+        context: ${{ inputs.docker-build-context }}
+        file: ${{ inputs.dockerfile-path }}
+        build-args: ${{ inputs.docker-build-args }}
+        tags: "$REGISTRY_URL/${{ inputs.container-repository-name }}/${{ inputs.docker-image-name }}:${{ inputs.github-sha }}"
         cache-from: type=gha
         cache-to: type=gha,mode=max
