@@ -37,6 +37,10 @@ inputs:
     description: 'The commit SHA, to be used to make the image tag unique'
     required: true
     default: ''
+  github-run-id:
+    description: 'The run ID, to be used to make the image tag unique'
+    required: true
+    default: ''
 runs:
   using: "composite"
   steps:
@@ -61,6 +65,6 @@ runs:
         context: ${{ inputs.docker-build-context }}
         file: ${{ inputs.dockerfile-path }}
         build-args: ${{ inputs.docker-build-args }}
-        tags: ${{ inputs.container-registry-url }}/${{ inputs.container-repository-name }}/${{ inputs.docker-image-name }}:${{ inputs.github-sha }}
+        tags: ${{ inputs.container-registry-url }}/${{ inputs.container-repository-name }}/${{ inputs.docker-image-name }}:${{ inputs.github-sha }}-${{ inputs.github-run-id }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
