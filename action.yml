@@ -61,6 +61,6 @@ runs:
         context: ${{ inputs.docker-build-context }}
         file: ${{ inputs.dockerfile-path }}
         build-args: ${{ inputs.docker-build-args }}
-        tags: ${{ inputs.container-registry-url }}/${{ inputs.container-repository-name }}/${{ inputs.docker-image-name }}:${{ inputs.github-sha }}"
+        tags: ${{ inputs.container-registry-url }}/${{ inputs.container-repository-name }}/${{ inputs.docker-image-name }}:${{ inputs.github-sha }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
