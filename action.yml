@@ -1,5 +1,5 @@
-name: 'Build and deploy action'
-description: 'Builds and deploys Vasio applications. Requires cluster credentials to authenticate with the cluster.'
+name: 'Build and push action'
+description: 'Creates Vasio images and pushes them to the given registry. Requires image repository credentials to push.'
 inputs:
   container-registry-url:
     description: 'URL for the container registry'
