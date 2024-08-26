@@ -33,14 +33,6 @@ inputs:
     description: 'The name of the image'
     required: true
     default: ''
-  github-sha:
-    description: 'The commit SHA, to be used to make the image tag unique'
-    required: true
-    default: ''
-  github-run-id:
-    description: 'The run ID, to be used to make the image tag unique'
-    required: true
-    default: ''
   kube-config-base64:
     description: 'The base64 encoded kubeconfig needed to connect to the cluster'
     required: true
@@ -69,7 +61,7 @@ runs:
         context: ${{ inputs.docker-build-context }}
         file: ${{ inputs.dockerfile-path }}
         build-args: ${{ inputs.docker-build-args }}
-        tags: ${{ inputs.container-registry-url }}/${{ inputs.container-repository-name }}/${{ inputs.docker-image-name }}:${{ inputs.github-sha }}-${{ inputs.github-run-id }}
+        tags: ${{ inputs.container-registry-url }}/${{ inputs.container-repository-name }}/${{ inputs.docker-image-name }}:${{ github.sha }}-${{ github.run_id }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -89,11 +81,11 @@ runs:
 
     - name: Create configMap if not exists
       if: steps.check-configmap.outcome == 'failure'
-      run: kubectl --kubeconfig=kubeconfig.yml create configmap cd-versions --from-literal=${{ inputs.docker-image-name }}=${{inputs.github-sha}}-${{ inputs.github-run-id }}
+      run: kubectl --kubeconfig=kubeconfig.yml create configmap cd-versions --from-literal=${{ inputs.docker-image-name }}=${{ github.sha }}-${{ github.run_id }}
       shell: bash
 
     - name: Update existing configmap
       if: steps.check-configmap.outcome == 'success'
       run: |
-        kubectl --kubeconfig=kubeconfig.yml patch cm cd-versions --type json --patch '[{ "op": "replace", "path": "/data/${{ inputs.docker-image-name }}", "value": "${{inputs.github-sha}}-${{ inputs.github-run-id }}" }]'
+        kubectl --kubeconfig=kubeconfig.yml patch cm cd-versions --type json --patch '[{ "op": "replace", "path": "/data/${{ inputs.docker-image-name }}", "value": "${{ github.sha }}-${{ github.run_id }}" }]'
       shell: bash
