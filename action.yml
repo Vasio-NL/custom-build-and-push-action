@@ -41,6 +41,10 @@ inputs:
     description: 'The run ID, to be used to make the image tag unique'
     required: true
     default: ''
+  kube-config-base64:
+    description: 'The base64 encoded kubeconfig needed to connect to the cluster'
+    required: true
+    default: ''
 runs:
   using: "composite"
   steps:
@@ -68,3 +72,28 @@ runs:
         tags: ${{ inputs.container-registry-url }}/${{ inputs.container-repository-name }}/${{ inputs.docker-image-name }}:${{ inputs.github-sha }}-${{ inputs.github-run-id }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
+    - name: Create kubeconfig file
+      run: echo ${{ inputs.kube-config-base64 }} | base64 -d > kubeconfig.yml
+      shell: bash
+
+    - name: Fetch kubectl
+      run: curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      shell: bash
+
+    - name: Check if configmap exists
+      id: check-configmap
+      run: kubectl --kubeconfig=kubeconfig.yml get configmap cd-versions -o json
+      shell: bash
+      continue-on-error: true
+
+    - name: Create configMap if not exists
+      if: steps.check-configmap.outcome == 'failure'
+      run: kubectl --kubeconfig=kubeconfig.yml create configmap cd-versions --from-literal=${{ inputs.docker-image-name }}=${{inputs.github-sha}}-${{ inputs.github-run-id }}
+      shell: bash
+
+    - name: Update existing configmap
+      if: steps.check-configmap.outcome == 'success'
+      run: |
+        kubectl --kubeconfig=kubeconfig.yml patch cm cd-versions --type json --patch '[{ "op": "replace", "path": "/data/${{ inputs.docker-image-name }}", "value": "${{inputs.github-sha}}-${{ inputs.github-run-id }}" }]'
+      shell: bash
