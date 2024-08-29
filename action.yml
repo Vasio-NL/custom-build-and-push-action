@@ -1,5 +1,5 @@
 name: 'Build and push action'
-description: 'Creates Vasio images and pushes them to the given registry. Requires image repository credentials to push.'
+description: 'Creates images and pushes them to the given registry. Requires image repository credentials to push.'
 inputs:
   container-registry-url:
     description: 'URL for the container registry'
