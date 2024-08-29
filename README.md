@@ -1,7 +1,7 @@
 ## Image build and push action
 
 This Github Action builds images and pushes them to a container registry.
-It also creates a configmap in a kubernetes cluster which keeps track of the latest version.
+It also creates/updates a configmap in a kubernetes cluster which keeps track of the latest version.
 This action is intended to be used with the custom [kubernetes deploy action](https://github.com/Vasio-NL/custom-k8s-deploy-action).
 
 Tags the image with the given name and pushes a new version to a kubernetes configmap.
