@@ -2,6 +2,8 @@
 
 This Github Action builds images and pushes them to a container registry.
 It also creates/updates a configmap in a kubernetes cluster which keeps track of the latest version.
+For pushing to Amazon Elastic Container Registry (ECR), see the [custom build and push ECR action](https://github.com/Vasio-NL/custom-build-and-push-ECR-action).
+
 This action is intended to be used with the custom [kubernetes deploy action](https://github.com/Vasio-NL/custom-k8s-deploy-action).
 
 Tags the image with the given name and pushes a new version to a kubernetes configmap.
