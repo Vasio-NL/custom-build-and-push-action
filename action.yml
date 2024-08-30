@@ -1,5 +1,5 @@
 name: 'Build and push action'
-description: 'Creates images and pushes them to the given registry. Requires image repository credentials to push.'
+description: 'Creates images and pushes them to the given registry. Requires image registry credentials to push.'
 inputs:
   container-registry-url:
     description: 'URL for the container registry'
@@ -13,8 +13,8 @@ inputs:
     description: 'Password for the container registry'
     required: true
     default: ''
-  container-repository-name:
-    description: 'The name of the container repository (middle part of the image tag)'
+  container-registry-name:
+    description: 'The name of the container registry (middle part of the image tag)'
     required: true
     default: ''
   dockerfile-path:
@@ -40,9 +40,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
@@ -61,7 +58,7 @@ runs:
         context: ${{ inputs.docker-build-context }}
         file: ${{ inputs.dockerfile-path }}
         build-args: ${{ inputs.docker-build-args }}
-        tags: ${{ inputs.container-registry-url }}/${{ inputs.container-repository-name }}/${{ inputs.docker-image-name }}:${{ github.sha }}-${{ github.run_id }}
+        tags: ${{ inputs.container-registry-url }}/${{ inputs.container-registry-name }}/${{ inputs.docker-image-name }}:${{ github.sha }}-${{ github.run_id }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
