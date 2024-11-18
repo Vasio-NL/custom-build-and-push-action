@@ -72,13 +72,18 @@ runs:
       shell: bash
       continue-on-error: true
 
+    - name: Escape configmap name
+      id: escape-configmap-name
+      run: echo "ESCAPED_CONFIGMAP_NAME=${{ inputs.container-repository-name }}" | sed 's/\//\\\//g' >> $GITHUB_ENV
+      shell: bash
+
     - name: Create configMap if not exists
       if: steps.check-configmap.outcome == 'failure'
-      run: kubectl --kubeconfig=kubeconfig.yml create configmap cd-versions --from-literal=${{ inputs.container-repository-name }}=${{ github.sha }}-${{ github.run_id }}
+      run: kubectl --kubeconfig=kubeconfig.yml create configmap cd-versions --from-literal=${{ env.ESCAPED_CONFIGMAP_NAME }}=${{ github.sha }}-${{ github.run_id }}
       shell: bash
 
     - name: Update existing configmap
       if: steps.check-configmap.outcome == 'success'
       run: |
-        kubectl --kubeconfig=kubeconfig.yml patch cm cd-versions --type json --patch '[{ "op": "add", "path": "/data/${{ inputs.container-repository-name }}", "value": "${{ github.sha }}-${{ github.run_id }}" }]'
+        kubectl --kubeconfig=kubeconfig.yml patch cm cd-versions --type json --patch '[{ "op": "add", "path": "/data/${{ env.ESCAPED_CONFIGMAP_NAME }}", "value": "${{ github.sha }}-${{ github.run_id }}" }]'
       shell: bash
