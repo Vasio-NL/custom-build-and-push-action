@@ -80,5 +80,5 @@ runs:
     - name: Update existing configmap
       if: steps.check-configmap.outcome == 'success'
       run: |
-        kubectl --kubeconfig=kubeconfig.yml patch cm cd-versions --type json --patch '[{ "op": "replace", "path": "/data/${{ inputs.container-repository-name }}", "value": "${{ github.sha }}-${{ github.run_id }}" }]'
+        kubectl --kubeconfig=kubeconfig.yml patch cm cd-versions --type json --patch '[{ "op": "add", "path": "/data/${{ inputs.container-repository-name }}", "value": "${{ github.sha }}-${{ github.run_id }}" }]'
       shell: bash
