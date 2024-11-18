@@ -10,26 +10,36 @@ Tags the image with the given name and pushes a new version to a kubernetes conf
 
 ### Inputs
 
-| Name                          | Description                                                                      | Required |
-|-------------------------------|----------------------------------------------------------------------------------| --- |
-| `container-registry-url`      | URL for the container registry                                                   | true |
-| `container-registry-username` | Username for the container registry                                              | true |
-| `container-registry-password` | Password for the container registry                                              | true |
-| `container-registry-name`     | The name of the container registry                                               | true |
-| `dockerfile-path`             | Path to the Dockerfile                                                           | true |
-| `docker-image-name`           | The name of the image                                                            | true |
-| `kube-config-base64`          | The base64 encoded kubeconfig needed to connect to the cluster                   | true |
-| `docker-build-context`        | The build context for the docker build. The default is the root directory. ('.') | false |
-| `docker-build-args`           | Optional additional build arguments for the docker build                         | false |
+| Name                          | Description                                                                                 | Required |
+|-------------------------------|---------------------------------------------------------------------------------------------| --- |
+| `container-registry-url`      | URL for the container registry                                                              | true |
+| `container-registry-username` | Username for the container registry                                                         | true |
+| `container-registry-password` | Password for the container registry                                                         | true |
+| `container-repository-name`   | The name of the image container repository, e.g. vasio/vasio-website, or just vasio-website | true |
+| `dockerfile-path`             | Path to the Dockerfile                                                                      | true |
+| `kube-config-base64`          | The base64 encoded kubeconfig needed to connect to the cluster                              | true |
+| `docker-build-context`        | The build context for the docker build. The default is the root directory. ('.')            | false |
+| `docker-build-args`           | Optional additional build arguments for the docker build                                    | false |
 
-The container registry name is the name that is prefixed to the image name. An example image:
+#### An example Azure image:
+
+`vasio.azurecr.io/vasio/cool-project:latest`
+
+In this example:
+- The <b>registry url</b> is `vasio.azurecr.io`.
+- The <b>container repository name</b> is `vasio/cool-project`.
+
+#### An example Digital Ocean image:
 
 `registry.digitalocean.com/vasio/cool-project:latest`
 
+
 In this example:
-- The <b>registry url</b> is `registry.digitalocean.com`.
-- The <b>container registry name</b> is `vasio`.
-- The <b>image name</b> is `cool-project`.
+- The <b>registry url</b> is `registry.digitalocean.com/vasio`.
+- The <b>container repository name</b> is `cool-project`.
+
+(Note that in digital ocean, the registry name is included after the \"/\" in the url. This is not the same as a repository name prefix (or namespace), which is not included in this example.)
+
 
 ### Example usage
 

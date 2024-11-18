@@ -13,8 +13,8 @@ inputs:
     description: 'Password for the container registry'
     required: true
     default: ''
-  container-registry-name:
-    description: 'The name of the container registry (middle part of the image tag)'
+  container-repository-name:
+    description: 'The name of the image repository, e.g. vasio/vasio-website, or just vasio-website'
     required: true
     default: ''
   dockerfile-path:
@@ -28,10 +28,6 @@ inputs:
   docker-build-args:
     description: 'Additional build arguments for the docker build'
     required: false
-    default: ''
-  docker-image-name:
-    description: 'The name of the image'
-    required: true
     default: ''
   kube-config-base64:
     description: 'The base64 encoded kubeconfig needed to connect to the cluster'
@@ -58,7 +54,7 @@ runs:
         context: ${{ inputs.docker-build-context }}
         file: ${{ inputs.dockerfile-path }}
         build-args: ${{ inputs.docker-build-args }}
-        tags: ${{ inputs.container-registry-url }}/${{ inputs.container-registry-name }}/${{ inputs.docker-image-name }}:${{ github.sha }}-${{ github.run_id }}
+        tags: ${{ inputs.container-registry-url }}/${{ inputs.container-repository-name }}:${{ github.sha }}-${{ github.run_id }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -78,11 +74,11 @@ runs:
 
     - name: Create configMap if not exists
       if: steps.check-configmap.outcome == 'failure'
-      run: kubectl --kubeconfig=kubeconfig.yml create configmap cd-versions --from-literal=${{ inputs.docker-image-name }}=${{ github.sha }}-${{ github.run_id }}
+      run: kubectl --kubeconfig=kubeconfig.yml create configmap cd-versions --from-literal=${{ inputs.container-repository-name }}=${{ github.sha }}-${{ github.run_id }}
       shell: bash
 
     - name: Update existing configmap
       if: steps.check-configmap.outcome == 'success'
       run: |
-        kubectl --kubeconfig=kubeconfig.yml patch cm cd-versions --type json --patch '[{ "op": "replace", "path": "/data/${{ inputs.docker-image-name }}", "value": "${{ github.sha }}-${{ github.run_id }}" }]'
+        kubectl --kubeconfig=kubeconfig.yml patch cm cd-versions --type json --patch '[{ "op": "replace", "path": "/data/${{ inputs.container-repository-name }}", "value": "${{ github.sha }}-${{ github.run_id }}" }]'
       shell: bash
