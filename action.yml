@@ -74,9 +74,10 @@ runs:
 
     - name: Escape configmap name
       id: escape-configmap-name
-      run: IMAGE_NAME=${{ inputs.container-repository-name }}"
-        $IMAGE_NAME="${IMAGE_NAME##*/}"
-        echo "IMAGE_NAME=${IMAGE_NAME}" >> $GITHUB_ENV
+      run: |
+        IMAGE_NAME="${{ inputs.container-repository-name }}"
+        IMAGE_NAME="${IMAGE_NAME##*/}"
+        echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
       shell: bash
 
     - name: Create configMap if not exists
