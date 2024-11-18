@@ -60,8 +60,7 @@ The following is an example build and push job:
           container-registry-url: ${{ vars.REGISTRY_URL }}
           container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
           container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-          container-registry-name: vasio
-          docker-image-name: 'cool-project'
+          container-repository-name: vasio/cool-project
           dockerfile-path: './docker/Dockerfile'
           kube-config-base64: ${{ secrets.KUBE_CONFIG_B64 }}
 ```
